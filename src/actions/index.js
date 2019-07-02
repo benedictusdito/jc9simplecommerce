@@ -51,3 +51,23 @@ export const onLogoutUser = () => {
     type: "LOGOUT_SUCCESS"
   };
 };
+
+export const addToCart = (id, inputQuantity) => {
+  return dispatch => {
+    axios.get("http://localhost:2020/products").then(res => {
+      console.log(res);
+
+      let addedItem = res.data.find(item => item.id === id); // an Object that we want
+      console.log(addedItem);
+      addedItem.quantity = inputQuantity;
+      dispatch({
+        type: "ADD_TO_CART",
+        payload: {
+          myCartPayload: addedItem,
+          totalPrice: addedItem.price * addedItem.quantity
+        }
+      });
+      console.log(addedItem);
+    });
+  };
+};

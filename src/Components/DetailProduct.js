@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { connect } from "react-redux";
+import { addToCart } from "../actions/index";
 
 class DetailProduct extends Component {
   state = {
@@ -25,8 +27,19 @@ class DetailProduct extends Component {
     //   });
   }
 
+  handleClick = id => {
+    const inputQuantity = parseInt(this.quantitiy.value);
+    console.log(inputQuantity);
+
+    if (isNaN(inputQuantity)) {
+      alert("Mohon masukan angka");
+    } else {
+      this.props.addToCart(id, inputQuantity);
+    }
+  };
+
   render() {
-    var { name, desc, price, src } = this.state.nameDetail;
+    var { name, desc, price, src, id } = this.state.nameDetail;
     return (
       <div className="card col-4 mt-5 mx-auto">
         <img className="card-img-top" src={src} />
@@ -36,17 +49,27 @@ class DetailProduct extends Component {
           <p className="card-text">Price: Rp.{price}</p>
           <form className="input-group my-3">
             <input
-              ref={input => (this.name = input)}
+              ref={input => (this.quantitiy = input)}
               className="form-control"
-              defaultValue="0"
+              placeholder="Quantity"
               type="number"
             />
           </form>
-          <button className="btn btn-primary">Add To Cart</button>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              this.handleClick(id);
+            }}
+          >
+            Add To Cart
+          </button>
         </div>
       </div>
     );
   }
 }
 
-export default DetailProduct;
+export default connect(
+  null,
+  { addToCart }
+)(DetailProduct);

@@ -56,7 +56,6 @@ class Header extends Component {
                 <NavItem>
                   <Link to="/">All Products</Link>
                 </NavItem>
-
                 <NavItem>
                   <Link to="/register">
                     <Button color="primary" className="mx-3">
@@ -86,6 +85,11 @@ class Header extends Component {
             <Nav className="ml-auto" navbar>
               <NavItem className="mt-2">
                 <Link to="/">All Products</Link>
+              </NavItem>
+              <NavItem className="mt-8">
+                <Link to="./cart">
+                  Jumlah Belanjaan: {this.props.user.totalUnit}
+                </Link>
               </NavItem>
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>

@@ -3,7 +3,9 @@ import { combineReducers } from "redux";
 const init = {
   id: "",
   username: "",
-  message: ""
+  myCart: [],
+  totalPrice: 0,
+  totalUnit: 0
 };
 
 const AuthReducer = (data = init, action) => {
@@ -20,6 +22,14 @@ const AuthReducer = (data = init, action) => {
         ...data,
         id: "",
         username: ""
+      };
+
+    case "ADD_TO_CART":
+      return {
+        ...data,
+        myCart: [...data.myCart, action.payload.myCartPayload],
+        totalPrice: data.totalPrice + action.payload.totalPrice,
+        totalUnit: data.totalUnit + action.payload.myCartPayload.quantity
       };
 
     default:

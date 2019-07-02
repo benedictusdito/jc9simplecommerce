@@ -1,13 +1,32 @@
-import React, { Component } from "react";
-// import { Link } from "mreact-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 
-class Checkout extends Component {
+class Checkout extends React.Component {
   render() {
     return (
-      <div>
-        <h1>Add To AddToChart</h1>
-      </div>
+      <center>
+        <Link to="/">
+          <button className="btn btn-warning text-white">
+            {" "}
+            <i className="fa fa-angle-left" /> Continue Shopping{" "}
+          </button>
+        </Link>
+
+        <span>
+          {" "}
+          <strong>Total : $ {this.props.total} </strong>{" "}
+        </span>
+
+        <button
+          className="btn btn-success"
+          onClick={() => alert("Thankyou :)")}
+        >
+          {" "}
+          <i className="fa fa-angle-left" /> Checkout{" "}
+        </button>
+      </center>
     );
   }
 }
+
 export default Checkout;
