@@ -3,30 +3,47 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { addToCart } from "../actions/index";
+import Axios from "axios";
 
 class ProductItem extends Component {
-  handleClick = id => {
+  funAddToChart = () => {
+    var { id, name, price, src } = this.props.barang;
     const inputQuantity = parseInt(this.quantitiy.value);
-    console.log(inputQuantity);
-    if (isNaN(inputQuantity)) {
-      alert("Mohon masukan quantitiy");
-    } else {
-      this.props.addToCart(id, inputQuantity);
-    }
-  };
-  handlePlus = () => {
-    this.setState({
-      order: this.state.order + 1
+    var idUser = this.props.user.id;
+    Axios.post("http://localhost:2020/cart", {
+      idUser: idUser,
+      idProduct: id,
+      namaProduct: name,
+      price: price,
+      quantitiy: inputQuantity,
+      src: src
+    }).then(res => {
+      console.log(res);
+      return alert("Data sudah diinput");
     });
   };
 
-  handleMinus = () => {
-    if (this.state.order > 0) {
-      this.setState({
-        order: this.state.order - 1
-      });
-    }
-  };
+  // handleClick = id => {
+  //   console.log(inputQuantity);
+  //   if (isNaN(inputQuantity)) {
+  //     alert("Mohon masukan data yang benar");
+  //   } else {
+  //     this.props.addToCart(id, inputQuantity);
+  //   }
+  // };
+  // handlePlus = () => {
+  //   this.setState({
+  //     order: this.state.order + 1
+  //   });
+  // };
+
+  // handleMinus = () => {
+  //   if (this.state.order > 0) {
+  //     this.setState({
+  //       order: this.state.order - 1
+  //     });
+  //   }
+  // };
   render() {
     var { id, name, price } = this.props.barang;
 
@@ -47,7 +64,7 @@ class ProductItem extends Component {
           <button
             className="btn btn-primary btn-block"
             onClick={() => {
-              this.handleClick(this.props.barang.id);
+              this.funAddToChart(this.props.barang);
             }}
           >
             Add To Cart
@@ -57,6 +74,7 @@ class ProductItem extends Component {
             className="form-control"
             placeholder="Quantity"
             type="number"
+            min="0"
           />
         </div>
       </div>
@@ -64,7 +82,13 @@ class ProductItem extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    user: state.auth // {id, username}
+  };
+};
+
 export default connect(
-  null,
+  mapStateToProps,
   { addToCart }
 )(ProductItem);

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import Axios from "axios";
 
 import { onLogoutUser } from "../actions";
 
@@ -24,19 +25,48 @@ class Header extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      cart: []
     };
   }
+  getChart = () => {
+    Axios.get("http://localhost:2020/cart").then(res => {
+      this.setState({ cart: res.data, selectedId: 0 });
+      console.log(this.state.cart);
+      console.log(res);
+    });
+  };
+
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
 
-  onButtonClick = () => {
-    // menghapus username dari redux state
-    this.props.onLogoutUser();
-  };
+  // state = {
+  //   cart: []
+  // };
+
+  // componentDidMount() {
+  //   Axios.get("http://localhost:2020/cart").then(res => {
+  //     this.setState({ cart: res.data });
+  //   });
+  // }
+
+  // onButtonClick = () => {
+  //   // menghapus username dari redux state
+  //   this.props.onLogoutUser();
+  // };
+
+  // totalCart = () => {
+  //   var total = 0;
+  //   for (let i = 0; i < array.length; i++) {
+  //     if (this.props.user.id === this.state.cart[i].idUser) {
+  //       total += 1;
+  //     }
+  //   }
+  //   return total;
+  // };
 
   render() {
     if (this.props.user.username == "") {
@@ -86,11 +116,7 @@ class Header extends Component {
               <NavItem className="mt-2">
                 <Link to="/">All Products</Link>
               </NavItem>
-              <NavItem className="mt-8">
-                <Link to="./cart">
-                  Jumlah Belanjaan: {this.props.user.totalUnit}
-                </Link>
-              </NavItem>
+              <NavItem className="mt-8" />
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
                   Hallo, {this.props.user.username}
@@ -99,7 +125,12 @@ class Header extends Component {
                   <DropdownItem>
                     <Link to="/manageproduct">Manage Product</Link>
                   </DropdownItem>
-                  <DropdownItem>Option 2</DropdownItem>
+                  <DropdownItem>
+                    {" "}
+                    <Link to="./cart">
+                      Jumlah Belanjaan: {this.state.myCart}
+                    </Link>
+                  </DropdownItem>
                   <DropdownItem divider />
                   <Button
                     className="dropdown-item"

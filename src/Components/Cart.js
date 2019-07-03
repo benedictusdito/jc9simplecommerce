@@ -2,42 +2,122 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Checkout from "./Checkout";
+import Axios from "axios";
 
 class Cart extends Component {
-  renderCart = () => {
-    if (this.props.dataState.myCart.length > 0) {
-      return this.props.dataState.myCart.map(item => {
-        return (
-          <tr key={this.props.dataState.myCart.id}>
-            <td>
-              <div className="row">
-                <div className="col-lg-2 Product-img">
-                  <img
-                    src={item.src}
-                    alt="Car Picture"
-                    className="img-responsive"
-                    style={{ width: "300px" }}
-                  />
-                </div>
-              </div>
-            </td>
+  state = {
+    myCart: [],
+    selectedId: 0
+  };
+  componentDidMount() {
+    this.getChart();
+  }
+  getChart = () => {
+    Axios.get("http://localhost:2020/cart").then(res => {
+      this.setState({ myCart: res.data, selectedId: 0 });
+      console.log(this.state.myCart);
+      console.log(res);
+    });
+  };
 
+  totalQuantity = () => {
+    // Mengambil objek di dalam array state myCart
+    // Menampung hasil penjumlahaan
+    var BesarQuantity = 0;
+    // Looping array hasil maping diatas
+    for (let i = 0; i < this.state.myCart.length; i++) {
+      BesarQuantity += parseInt(this.state.myCart[i].quantitiy);
+    }
+    return (
+      // Merender hasil penjumlahan quantity & dimasukan ke besarQuantity
+      <td>{BesarQuantity}</td>
+    );
+  };
+  deleteCart = id => {
+    Axios.delete("http://localhost:2020/cart/" + id).then(res => {
+      this.getChart();
+    });
+  };
+
+  saveCart = item => {
+    // Buat penampungan untuk quantity
+    const quantitiyBaru = this.editQuantity.value;
+
+    Axios.patch("http://localhost:2020/cart/" + item.id, {
+      quantitiy: quantitiyBaru
+    }).then(res => this.getChart());
+  };
+
+  renderList = () => {
+    return this.state.myCart.map(item => {
+      if (item.id !== this.state.selectedId) {
+        return (
+          <tr>
             <td>
-              <div className="col-lg-10">
-                <b>{item.nama}</b>
-              </div>
+              <img className="list" src={item.src} />
             </td>
+            <td>{item.namaProduct}</td>
+            <td>{item.price}</td>
+            <td>{item.quantitiy}</td>
+            <td>{item.quantitiy * item.price}</td>
             <td>
-              {" "}
-              <p>{item.desc}</p>{" "}
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  this.setState({ selectedId: item.id });
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                className="btn btn-warning"
+                onClick={() => this.deleteCart(item.id)}
+              >
+                Delete
+              </button>
             </td>
-            <td> Rp. {item.price} </td>
-            <td>{item.quantity} Units</td>
-            <td> Rp. {item.quantity * item.price} </td>
           </tr>
         );
-      });
-    }
+      } else {
+        return (
+          <tr>
+            <td>
+              <img className="list" src={item.src} />
+            </td>
+            <td>{item.namaProduct}</td>
+            <td>{item.price}</td>
+            <td>
+              <input
+                className="form-control"
+                ref={input => {
+                  this.editQuantity = input;
+                }}
+              />
+            </td>
+            <td>{item.quantitiy * item.price}</td>
+            <td>
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  this.saveCart(item);
+                }}
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-warning"
+                onClick={() => this.setState({ selectedId: 0 })}
+              >
+                Cancel
+              </button>
+            </td>
+          </tr>
+        );
+      }
+
+      // this.state.products.map(item => { {id.name,price,desc,src}
+    });
   };
 
   render() {
@@ -46,7 +126,7 @@ class Cart extends Component {
         <div className="col-lg-12 pl-3 pt-3">
           {this.props.dataState.myCart.length === 0 ? (
             <center>
-              <h3> No item available on your cart. </h3>
+              <h3>Hallo, {this.props.dataState.username} </h3>
               <h3>
                 {" "}
                 <Link to="/"> Buy products here </Link>
@@ -70,16 +150,24 @@ class Cart extends Component {
                 <th>
                   <center> Gambar </center>
                 </th>
-                <th>
-                  <center> Car </center>
-                </th>
+
                 <th>Desc</th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Subtotal</th>
               </tr>
             </thead>
-            <tbody>{this.renderCart()}</tbody>
+            <tbody>
+              {this.renderList()}
+              <tr>
+                <td />
+                <td />
+
+                <td>
+                  <h1>Total Belanjaan: {this.totalQuantity()}</h1>
+                </td>
+              </tr>
+            </tbody>
           </table>
 
           {this.props.dataState.myCart.length > 0 ? (
