@@ -47,16 +47,16 @@ class Header extends Component {
   //   cart: []
   // };
 
-  // componentDidMount() {
-  //   Axios.get("http://localhost:2020/cart").then(res => {
-  //     this.setState({ cart: res.data });
-  //   });
-  // }
+  componentDidMount() {
+    Axios.get("http://localhost:2020/cart").then(res => {
+      this.setState({ cart: res.data });
+    });
+  }
 
-  // onButtonClick = () => {
-  //   // menghapus username dari redux state
-  //   this.props.onLogoutUser();
-  // };
+  onButtonClick = () => {
+    // menghapus username dari redux state
+    this.props.onLogoutUser();
+  };
 
   // totalCart = () => {
   //   var total = 0;

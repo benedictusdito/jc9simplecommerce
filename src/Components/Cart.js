@@ -3,15 +3,28 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Checkout from "./Checkout";
 import Axios from "axios";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 class Cart extends Component {
-  state = {
-    myCart: [],
-    selectedId: 0
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      myCart: [],
+      selectedId: 0,
+      modal: false
+    };
+    this.toggle = this.toggle.bind(this);
+  }
+  toggle() {
+    this.setState(prevState => ({
+      modal: !prevState.modal
+    }));
+  }
+
   componentDidMount() {
     this.getChart();
   }
+
   getChart = () => {
     Axios.get("http://localhost:2020/cart").then(res => {
       this.setState({ myCart: res.data, selectedId: 0 });
@@ -48,37 +61,90 @@ class Cart extends Component {
     }).then(res => this.getChart());
   };
 
+  hargaTotal = () => {
+    // Mengambil objek di dalam array state myCart
+    // Menampung hasil perkalian
+    var totalHarga = 0;
+    for (let i = 0; i < this.state.myCart.length; i++) {
+      if (this.props.dataState.id === this.state.myCart[i].idUser) {
+        {
+          totalHarga += parseInt(
+            this.state.myCart[i].quantitiy * this.state.myCart[i].price
+          );
+        }
+      }
+    }
+    return totalHarga;
+  };
+
+  checkout = () => {
+    return (
+      <div className="container">
+        <div className="col-lg-12 pl-3 pt-3">
+          <table className="table table-hover border bg-white">
+            <thead>
+              <tr>
+                <th>
+                  <center> Gambar </center>
+                </th>
+
+                <th>Desc</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td />
+                <td />
+                <td />
+                <td>
+                  <p>Total Belanjaan:</p>
+                </td>
+                <td />
+                <td />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   renderList = () => {
     return this.state.myCart.map(item => {
       if (item.id !== this.state.selectedId) {
-        return (
-          <tr>
-            <td>
-              <img className="list" src={item.src} />
-            </td>
-            <td>{item.namaProduct}</td>
-            <td>{item.price}</td>
-            <td>{item.quantitiy}</td>
-            <td>{item.quantitiy * item.price}</td>
-            <td>
-              <button
-                className="btn btn-danger"
-                onClick={() => {
-                  this.setState({ selectedId: item.id });
-                }}
-              >
-                Edit
-              </button>
+        if (item.idUser === this.props.dataState.id) {
+          return (
+            <tr>
+              <td>
+                <img className="list" src={item.src} />
+              </td>
+              <td>{item.namaProduct}</td>
+              <td>Rp. {item.price}</td>
+              <td>{item.quantitiy}</td>
+              <td>{item.quantitiy * item.price}</td>
+              <td>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    this.setState({ selectedId: item.id });
+                  }}
+                >
+                  Edit
+                </button>
 
-              <button
-                className="btn btn-warning"
-                onClick={() => this.deleteCart(item.id)}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        );
+                <button
+                  className="btn btn-warning"
+                  onClick={() => this.deleteCart(item.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          );
+        }
       } else {
         return (
           <tr>
@@ -162,14 +228,25 @@ class Cart extends Component {
               <tr>
                 <td />
                 <td />
-
+                <td />
                 <td>
-                  <h1>Total Belanjaan: {this.totalQuantity()}</h1>
+                  <p>Total Belanjaan:</p>
+                </td>
+                <td>
+                  <p>Rp. {this.hargaTotal()}</p>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-warning text-white"
+                    onClick={this.checkout()}
+                  >
+                    {" "}
+                    <i className="fa fa-angle-right" /> Check Out{" "}
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
-
           {this.props.dataState.myCart.length > 0 ? (
             <center>
               <Checkout total={this.props.dataState.totalPrice} />
@@ -177,6 +254,29 @@ class Cart extends Component {
           ) : (
             ""
           )}
+        </div>
+        <div>
+          <Button color="danger" onClick={this.toggle}>
+            Bayar
+          </Button>
+          <Modal
+            isOpen={this.state.modal}
+            toggle={this.toggle}
+            className={this.props.className}
+          >
+            <ModalHeader toggle={this.toggle}>Pembayaran Belanjaan</ModalHeader>
+            <ModalBody>
+              <p>Total yang perlu dibayar Rp. {this.hargaTotal()}</p>
+              <ModalFooter>
+                <Button color="primary" onClick={this.toggle}>
+                  Bayar
+                </Button>{" "}
+                <Button color="secondary" onClick={this.toggle}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </ModalBody>
+          </Modal>
         </div>
       </div>
     );
